@@ -1,0 +1,18 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "username": "artin_ap",
+      "fullname": "artin paravar",
+      "email": "artinparavar@gmail.com",
+      "password": "artin1386"
+    },
+    {
+      "id": "2",
+      "username": "armin_ap",
+      "fullname": "armin paravar",
+      "email": "arminparavar@gmail.com",
+      "password": "13861386"
+    }
+  ]
+}
