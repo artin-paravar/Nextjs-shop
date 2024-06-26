@@ -1,113 +1,96 @@
 "use client";
-import React, { createContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
+
+import { useLocalStorage } from "../hooks/useLocalStorage";
 import { Navbar } from "../components/navbar/navbar";
-import axios from "axios";
 
-export type Context = {
-  getTotalCartAmount: () => number;
-  gettotalCartItems: () => number;
-  addToCart: (itemId: number) => void;
-  removeFromCart: (itemId: number) => void;
-  updateCartItemCount: (itemId: number, newAmount: number) => void;
-  checkout: () => void;
-  DeleteFromCart: (itemId: number) => void;
-  cartItems: any;
-  category: string;
-  setcategory: React.Dispatch<React.SetStateAction<string>>;
+type ShoppingCartProviderProps = {
+  children: ReactNode;
 };
-type Children = {
-  children: React.ReactNode;
+
+type CartItem = {
+  id: number;
+  quantity: number;
 };
-export const ShopContext = createContext<Context | null>(null);
-////////////////////
-export const ShopContextProvider = ({ children }: Children) => {
-  const [category, setcategory] = useState<string>("All");
-  const [Products, setProducts] = useState([]);
 
-  async function Fetch() {
-    try {
-      const res = await axios.get("https://fakestoreapi.com/products");
-      setProducts(res.data);
-      return res.data;
-    } catch (error) {
-      console.log(error);
-    }
+type ShoppingCartContext = {
+  getItemQuantity: (id: number) => number;
+  increaseCartQuantity: (id: number) => void;
+  decreaseCartQuantity: (id: number) => void;
+  removeFromCart: (id: number) => void;
+  cartQuantity: number;
+  cartItems: CartItem[];
+};
+
+const ShoppingCartContext = createContext({} as ShoppingCartContext);
+
+export function useShoppingCart() {
+  return useContext(ShoppingCartContext);
+}
+export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
+  const [cartItems, setCartItems] = useLocalStorage<CartItem[]>(
+    "shopping-cart",
+    []
+  );
+
+  const cartQuantity = cartItems.reduce(
+    (quantity, item) => item.quantity + quantity,
+    0
+  );
+
+  function getItemQuantity(id: number) {
+    return cartItems.find((item) => item.id === id)?.quantity || 0;
   }
-  function getDefaultCart() {
-    let cart: any = {};
-    for (let i = 1; i < 20 + 1; i++) {
-      cart[i] = 0;
-    }
-    return cart;
+
+  function increaseCartQuantity(id: number) {
+    setCartItems((currItems) => {
+      if (currItems.find((item) => item.id === id) == null) {
+        return [...currItems, { id, quantity: 1 }];
+      } else {
+        return currItems.map((item) => {
+          if (item.id === id) {
+            return { ...item, quantity: item.quantity + 1 };
+          } else {
+            return item;
+          }
+        });
+      }
+    });
   }
-
-  const [cartItems, setCartItems] = useState(getDefaultCart());
-
-  useEffect(() => {
-    Fetch();
-  }, []);
-
-  //////////////
-
-  const getTotalCartAmount = () => {
-    let totalAmount = 0;
-    for (const item in cartItems) {
-      if (cartItems[item] > 0) {
-        let itemInfo: any = Products.find(
-          (product: any) => product.id === Number(item)
-        )!;
-        totalAmount += cartItems[item] * itemInfo.price;
+  function decreaseCartQuantity(id: number) {
+    setCartItems((currItems) => {
+      if (currItems.find((item) => item.id === id)?.quantity === 1) {
+        return currItems.filter((item) => item.id !== id);
+      } else {
+        return currItems.map((item) => {
+          if (item.id === id) {
+            return { ...item, quantity: item.quantity - 1 };
+          } else {
+            return item;
+          }
+        });
       }
-    }
-    return Math.round(totalAmount);
-  };
-  //
-  const gettotalCartItems = () => {
-    let totalItem = 0;
-    for (const item in cartItems) {
-      if (cartItems[item] > 0) {
-        totalItem += cartItems[item];
-      }
-    }
-    return totalItem;
-  };
-
-  const addToCart = (itemId: number) => {
-    setCartItems({ ...cartItems, [itemId]: cartItems[itemId] + 1 });
-  };
-
-  const removeFromCart = (itemId: number) => {
-    setCartItems({ ...cartItems, [itemId]: cartItems[itemId] - 1 });
-  };
-
-  const updateCartItemCount = (newAmount: number, itemId: number) => {
-    setCartItems({ ...cartItems, [itemId]: newAmount });
-  };
-
-  const checkout = () => {
-    setCartItems(getDefaultCart());
-  };
-  const DeleteFromCart = (itemId: number) => {
-    setCartItems({ ...cartItems, [itemId]: 0 });
-  };
-
-  const contextValue: Context = {
-    cartItems,
-    addToCart,
-    DeleteFromCart,
-    updateCartItemCount,
-    removeFromCart,
-    getTotalCartAmount,
-    checkout,
-    gettotalCartItems,
-    category,
-    setcategory,
-  };
+    });
+  }
+  function removeFromCart(id: number) {
+    setCartItems((currItems) => {
+      return currItems.filter((item) => item.id !== id);
+    });
+  }
 
   return (
-    <ShopContext.Provider value={contextValue}>
+    <ShoppingCartContext.Provider
+      value={{
+        getItemQuantity,
+        increaseCartQuantity,
+        decreaseCartQuantity,
+        removeFromCart,
+        cartItems,
+        cartQuantity,
+      }}
+    >
       <Navbar />
       {children}
-    </ShopContext.Provider>
+    </ShoppingCartContext.Provider>
   );
-};
+}

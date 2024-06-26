@@ -1,4 +1,3 @@
-import React, { useContext } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
@@ -15,7 +14,7 @@ export const Product = ({ id, title, price, description, image }: any) => {
       </div>
       <div className="description">
         <p>
-          <b>{title.slice(0, 20)}..</b>
+          <b className="line-clamp-1">{title}</b>
         </p>
         <p> ${price}</p>
       </div>

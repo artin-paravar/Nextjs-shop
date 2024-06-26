@@ -1,9 +1,13 @@
-import { StaticImageData } from "next/image";
-
-export type Products = {
+export interface Products {
   id: number;
   title: string;
   price: number;
   description: string;
-  image: StaticImageData;
-};
+  category: string;
+  image: any;
+  rating: Rating;
+}
+interface Rating {
+  rate: number;
+  count: number;
+}

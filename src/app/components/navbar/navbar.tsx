@@ -2,11 +2,12 @@ import Link from "next/link";
 import { PiShoppingCartThin } from "react-icons/pi";
 
 import "./navbar.css";
-import { useContext } from "react";
-import { Context, ShopContext } from "@/app/context/shop-context";
+import { useContext, useEffect, useState } from "react";
+import { useShoppingCart } from "@/app/context/shop-context";
+import { getProduct } from "@/app/services/api";
 
 export const Navbar = () => {
-  const { gettotalCartItems } = useContext(ShopContext) as Context;
+  const { cartQuantity } = useShoppingCart();
 
   return (
     <>
@@ -16,7 +17,7 @@ export const Navbar = () => {
           <Link href={"/login"}>login</Link>
           <Link href={"/cart"} className="relative ">
             <span className="absolute top-0 right-0 z-0 text-[12px] translate-x-1 bg-orange-500 rounded-[50%] w-[16px] h-[16px] items-center flex justify-center">
-              {gettotalCartItems()}
+              {cartQuantity}
             </span>
             <PiShoppingCartThin size={32} />
           </Link>

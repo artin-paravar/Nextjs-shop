@@ -28,7 +28,8 @@
     ".next/types/**/*.ts",
     "src/app/context/shop-context.tsx",
     "src/app/shop/[id]/page.tsx",
-    "src/app/components/navbar/navbarrjsx"
+    "src/app/components/navbar/navbarrjsx",
+    "src/app/local/localstorage.ts"
   ],
   "exclude": ["node_modules"]
 }

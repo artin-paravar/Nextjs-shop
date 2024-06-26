@@ -7,25 +7,18 @@ import { FilterItem } from "../components/filter/filter";
 import axios from "axios";
 
 import { SkeletonPage } from "../skeleton";
+import { getProducts } from "../services/api";
 
 export function Shop() {
   const [Category, setcategory] = useState<string>("All");
   const [Products, setProducts] = useState([]);
   const [Loading, setLoading] = useState(false);
-  async function Fetch() {
-    try {
-      const res = await axios.get("https://fakestoreapi.com/products");
-      setProducts(res.data);
 
-      return res.data;
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(true);
-    }
-  }
   useEffect(() => {
-    Fetch();
+    getProducts().then((result) => {
+      setProducts(result);
+      setLoading(true);
+    });
   }, []);
   function getItem() {
     let item: any = [];
@@ -61,8 +54,8 @@ export function Shop() {
               }
             )}
           {!Loading &&
-            getItem().map(({ n }: any) => {
-              return <SkeletonPage key={n} />;
+            getItem().map(({ id }: any) => {
+              return <SkeletonPage key={id} />;
             })}
         </div>
       </div>

@@ -47,6 +47,7 @@ export default function Login() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    ///////////////
     const validationErrors: ERROR = {};
 
     if (formData.emailORusername.length <= 0) {
@@ -62,7 +63,7 @@ export default function Login() {
     }
 
     setErrors(validationErrors);
-    //
+    ///////////////
 
     const data = userData.find(
       (item: Item) =>
