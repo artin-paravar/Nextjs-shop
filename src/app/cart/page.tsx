@@ -20,7 +20,7 @@ export default function Cart() {
   }, []);
 
   return (
-    <div className="cart p-5">
+    <div className="cart p-4">
       {cartItems.map((item) => {
         return <CartItem key={item.id} {...item} quantity={item.quantity} />;
       })}
